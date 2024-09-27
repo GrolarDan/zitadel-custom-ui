@@ -24,18 +24,28 @@ export function middleware(request: NextRequest) {
   // this is a workaround for the next.js server not forwarding the host header
   requestHeaders.set(
     "x-zitadel-instance-host",
-    `${INSTANCE}`.replace("https://", ""),
+    `${INSTANCE}`.replace("https://", "").replace("http://", ""),
   );
+
+
+  console.log("=== middleware ===");
+  console.log("nextUrl", request.nextUrl);
+  console.log("requestHeaders", requestHeaders);
 
   const responseHeaders = new Headers();
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
 
   request.nextUrl.href = `${INSTANCE}${request.nextUrl.pathname}${request.nextUrl.search}`;
-  return NextResponse.rewrite(request.nextUrl, {
+  const response = NextResponse.rewrite(request.nextUrl, {
     request: {
       headers: requestHeaders,
     },
     headers: responseHeaders,
   });
+
+  console.log("=== middleware response ===");
+  console.log("response", response);
+
+  return response;
 }
